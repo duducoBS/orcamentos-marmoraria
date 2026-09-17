@@ -1,8 +1,16 @@
-# Build & Object files (.NET / Android)
+# Build & Object files (.NET / Android / Windows)
 bin/
 obj/
 AndroidApp/bin/
 AndroidApp/obj/
+WindowsApp/bin/
+WindowsApp/obj/
+WindowsApp/publish*/
+WindowsApp/payload*
+InstallerApp/
+InstaladorWindows/
+Instalador_Orcamentos_Windows.exe
+Instalador_Orcamentos_Windows.zip
 .vs/
 
 # Logs e arquivos temporários
