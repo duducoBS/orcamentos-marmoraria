@@ -8,9 +8,7 @@ using Android.Webkit;
 namespace OrcamentosMarmoraria;
 
 [Activity(
-    Label = "Orçamentos",
-    Icon = "@mipmap/appicon",
-    RoundIcon = "@mipmap/appicon_round",
+    Label = "Orçamentos Marmoraria",
     MainLauncher = true,
     Theme = "@android:style/Theme.NoTitleBar.Fullscreen",
     ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize
@@ -41,13 +39,9 @@ public class MainActivity : Activity
         settings.SetSupportZoom(true);
         settings.BuiltInZoomControls = true;
         settings.DisplayZoomControls = false;
-        settings.UseWideViewPort = true;
-        settings.LoadWithOverviewMode = true;
 
         _webView.SetWebViewClient(new CustomWebViewClient(this));
-        _webView.SetWebChromeClient(new CustomWebChromeClient(this));
-
-        _webView.AddJavascriptInterface(new AndroidPrintInterface(this, _webView), "AndroidPrinter");
+        _webView.SetWebChromeClient(new WebChromeClient());
 
         SetContentView(_webView);
 
@@ -64,17 +58,12 @@ public class MainActivity : Activity
                 if (printManager != null && _webView != null)
                 {
                     var printAdapter = _webView.CreatePrintDocumentAdapter("Orcamento_Marmoraria");
-                    var printAttributes = new PrintAttributes.Builder()
-                        .SetMediaSize(PrintAttributes.MediaSize.IsoA4)
-                        .SetMinMargins(PrintAttributes.Margins.NoMargins)
-                        .Build();
-
-                    printManager.Print("Orçamento Marmoraria", printAdapter, printAttributes);
+                    printManager.Print("Orçamento Marmoraria", printAdapter, new PrintAttributes.Builder().Build());
                 }
             }
             catch (System.Exception ex)
             {
-                Android.Widget.Toast.MakeText(this, "Erro ao abrir impressão: " + ex.Message, Android.Widget.ToastLength.Long)?.Show();
+                Android.Widget.Toast.MakeText(this, "Erro ao gerar PDF: " + ex.Message, Android.Widget.ToastLength.Long)?.Show();
             }
         });
     }
@@ -114,18 +103,10 @@ public class CustomWebViewClient : WebViewClient
     public override bool ShouldOverrideUrlLoading(WebView? view, IWebResourceRequest? request)
     {
         if (request?.Url == null) return false;
-        return HandleCustomUrl(request.Url.ToString());
-    }
-
-    public override bool ShouldOverrideUrlLoading(WebView? view, string? url)
-    {
+        var url = request.Url.ToString();
         if (string.IsNullOrEmpty(url)) return false;
-        return HandleCustomUrl(url);
-    }
 
-    private bool HandleCustomUrl(string url)
-    {
-        // Intercepta comando de impressão nativa
+        // Intercepta comando de impressão nativa do Android
         if (url.StartsWith("app://print") || url.StartsWith("action://print"))
         {
             _activity.PrintDocument();
@@ -143,53 +124,11 @@ public class CustomWebViewClient : WebViewClient
             }
             catch
             {
-                var intent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(url));
-                _activity.StartActivity(intent);
                 return true;
             }
         }
 
         return false;
-    }
-}
-
-public class CustomWebChromeClient : WebChromeClient
-{
-    private readonly MainActivity _activity;
-
-    public CustomWebChromeClient(MainActivity activity)
-    {
-        _activity = activity;
-    }
-
-    // Interceptação via JS Prompt (bridge 100% compatível em todas as versões do Android)
-    public override bool OnJsPrompt(WebView? view, string? url, string? message, string? defaultValue, JsPromptResult? result)
-    {
-        if (message == "ANDROID_PRINT")
-        {
-            _activity.PrintDocument();
-            result?.Confirm("OK");
-            return true;
-        }
-        return base.OnJsPrompt(view, url, message, defaultValue, result);
-    }
-}
-
-public class AndroidPrintInterface : Java.Lang.Object
-{
-    private readonly MainActivity _activity;
-    private readonly WebView _webView;
-
-    public AndroidPrintInterface(MainActivity activity, WebView webView)
-    {
-        _activity = activity;
-        _webView = webView;
-    }
-
-    [JavascriptInterface]
-    public void Print()
-    {
-        _activity.PrintDocument();
     }
 }
 

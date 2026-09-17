@@ -647,8 +647,15 @@ function configurarEventos() {
   });
 
   document.getElementById("btn-imprimir").addEventListener("click", () => {
-    executarImpressao();
+    executarImpressaoPC();
   });
+
+  const btnAndroid = document.getElementById("btn-imprimir-android");
+  if (btnAndroid) {
+    btnAndroid.addEventListener("click", () => {
+      executarImpressaoAndroid();
+    });
+  }
 
   // Botões de itens e parcelas
   document.getElementById("btn-adicionar-item").addEventListener("click", () => {
@@ -836,50 +843,34 @@ function importarDadosJson(event) {
   reader.readAsText(file);
 }
 
-// Execução de impressão com suporte nativo ao Android e navegadores
-function executarImpressao() {
-  if (window.AndroidPrinter && typeof window.AndroidPrinter.Print === 'function') {
-    window.AndroidPrinter.Print();
-  } else {
-    window.print();
-  }
+// Impressão padrão para Computador / PC (abre o diálogo do navegador perfeitamente como antes)
+function executarImpressaoPC() {
+  window.print();
 }
 
-// Execução de impressão com suporte nativo ao Android e navegadores
-function executarImpressao() {
-  // Se estiver no celular, muda para a aba de prévia da folha para renderizar o layout completo
+// Impressão específica para Celular / Aplicativo Android
+function executarImpressaoAndroid() {
+  // 1. No celular, muda para a aba de prévia da folha para renderizar o layout A4 completo
   alternarAbaMobile('preview');
 
-  // Aguarda o DOM da prévia posicionar
+  // 2. Dispara a chamada nativa do aplicativo Android
   setTimeout(() => {
-    // 1. Tenta via prompt bridge do WebView nativo (funciona 100% no APK Android)
-    try {
-      if (typeof window.prompt === 'function') {
-        const handled = window.prompt("ANDROID_PRINT");
-        if (handled === "OK") return;
-      }
-    } catch (e) {
-      console.warn("Prompt bridge falhou:", e);
-    }
-
-    // 2. Tenta via URL scheme interceptado pelo WebView
     try {
       window.location.href = "app://print";
-    } catch (e) {}
+    } catch (e) {
+      console.warn("Falha ao acionar protocolo do app:", e);
+    }
 
-    // 3. Tenta via interface JavascriptInterface
-    try {
-      if (window.AndroidPrinter && typeof window.AndroidPrinter.Print === 'function') {
-        window.AndroidPrinter.Print();
-        return;
-      }
-    } catch (e) {}
-
-    // 4. Fallback para navegadores comuns (Desktop Chrome/Edge ou Chrome Mobile PWA)
+    // Fallback: se estiver em navegador mobile comum (fora do APK)
     setTimeout(() => {
       window.print();
-    }, 150);
-  }, 120);
+    }, 500);
+  }, 250);
+}
+
+// Compatibilidade
+function executarImpressao() {
+  executarImpressaoPC();
 }
 
 // Utilitário para escapar caracteres HTML

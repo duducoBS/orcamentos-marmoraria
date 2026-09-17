@@ -36,8 +36,11 @@
       <button type="button" class="btn btn-secondary" id="btn-empresa-config">
         ⚙️ Empresa
       </button>
-      <button type="button" class="btn btn-print" id="btn-imprimir">
+      <button type="button" class="btn btn-print" id="btn-imprimir" title="Imprimir / PDF no Computador">
         🖨️ Imprimir / PDF
+      </button>
+      <button type="button" class="btn btn-android-pdf" id="btn-imprimir-android" title="Gerar PDF no Celular / Android">
+        📱 PDF Android
       </button>
     </div>
   </header>
@@ -224,8 +227,11 @@
         <button type="button" class="btn btn-whatsapp btn-sm" onclick="enviarWhatsApp()" title="Enviar pelo WhatsApp">
           📲 WhatsApp
         </button>
-        <button type="button" class="btn btn-print btn-sm" onclick="executarImpressao()">
+        <button type="button" class="btn btn-print btn-sm" onclick="executarImpressaoPC()" title="Imprimir / PDF no Computador">
           🖨️ Imprimir / PDF
+        </button>
+        <button type="button" class="btn btn-android-pdf btn-sm" onclick="executarImpressaoAndroid()" title="Gerar PDF no Celular / Android">
+          📱 PDF Android
         </button>
       </div>
 
