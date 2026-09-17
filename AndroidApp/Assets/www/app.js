@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   configurarEventos();
+  configurarMascaras();
 });
 
 // Carrega configurações e orçamentos do LocalStorage
@@ -73,6 +74,9 @@ function carregarDadosLocais() {
       const parsed = JSON.parse(savedAtual);
       // Limpa caso seja o exemplo antigo com dados de cliente
       if (parsed && parsed.id !== "orc_exemplo" && (!parsed.cliente || parsed.cliente.nome !== "Edifício Allure")) {
+        if (parsed.cliente && (parsed.cliente.foneCel === "(11) 98765-4321" || parsed.cliente.foneCel === "98765-4321")) {
+          parsed.cliente.foneCel = "";
+        }
         appData.orcamentoAtual = parsed;
       } else {
         appData.orcamentoAtual = null;
@@ -109,6 +113,8 @@ function novoOrcamento(confirmar = true) {
     cliente: {
       nome: "",
       endereco: "",
+      numero: "",
+      complemento: "",
       bairro: "",
       cep: "",
       cidade: appData.empresa.cidadePadrao || "São Paulo",
@@ -226,9 +232,11 @@ function preencherFormulario() {
 
   // Cliente
   document.getElementById("f-cli-nome").value = orc.cliente.nome || "";
-  document.getElementById("f-cli-endereco").value = orc.cliente.endereco || "";
-  document.getElementById("f-cli-bairro").value = orc.cliente.bairro || "";
   document.getElementById("f-cli-cep").value = orc.cliente.cep || "";
+  document.getElementById("f-cli-endereco").value = orc.cliente.endereco || "";
+  document.getElementById("f-cli-numero").value = orc.cliente.numero || "";
+  document.getElementById("f-cli-complemento").value = orc.cliente.complemento || "";
+  document.getElementById("f-cli-bairro").value = orc.cliente.bairro || "";
   document.getElementById("f-cli-cidade").value = orc.cliente.cidade || "";
   document.getElementById("f-cli-estado").value = orc.cliente.estado || "";
   document.getElementById("f-cli-foneres").value = orc.cliente.foneRes || "";
@@ -489,7 +497,16 @@ function atualizarPreview() {
 
   // Cliente
   document.getElementById("p-cli-nome").innerText = orc.cliente.nome || "";
-  document.getElementById("p-cli-endereco").innerText = orc.cliente.endereco || "";
+  
+  let enderecoCompleto = orc.cliente.endereco || "";
+  if (orc.cliente.numero && orc.cliente.numero.trim()) {
+    enderecoCompleto += (enderecoCompleto ? ", Nº " : "Nº ") + orc.cliente.numero.trim();
+  }
+  if (orc.cliente.complemento && orc.cliente.complemento.trim()) {
+    enderecoCompleto += (enderecoCompleto ? " - " : "") + orc.cliente.complemento.trim();
+  }
+  document.getElementById("p-cli-endereco").innerText = enderecoCompleto;
+
   document.getElementById("p-cli-bairro").innerText = orc.cliente.bairro || "";
   document.getElementById("p-cli-cep").innerText = orc.cliente.cep || "";
   document.getElementById("p-cli-cidade").innerText = orc.cliente.cidade || "";
@@ -611,6 +628,8 @@ function configurarEventos() {
   // Cliente
   bindInput("f-cli-nome", v => appData.orcamentoAtual.cliente.nome = v);
   bindInput("f-cli-endereco", v => appData.orcamentoAtual.cliente.endereco = v);
+  bindInput("f-cli-numero", v => appData.orcamentoAtual.cliente.numero = v);
+  bindInput("f-cli-complemento", v => appData.orcamentoAtual.cliente.complemento = v);
   bindInput("f-cli-bairro", v => appData.orcamentoAtual.cliente.bairro = v);
   bindInput("f-cli-cep", v => appData.orcamentoAtual.cliente.cep = v);
   bindInput("f-cli-cidade", v => appData.orcamentoAtual.cliente.cidade = v);
@@ -945,6 +964,201 @@ Contato: ${emp.fone1} (${emp.resp1})`;
     : `https://api.whatsapp.com/send?text=${encodeURIComponent(textoMensagem)}`;
 
   window.open(urlZap, '_blank');
+}
+
+// =========================================================
+// MÁSCARAS DE ENTRADA E CONSULTA AUTOMÁTICA DE CEP (ViaCEP)
+// =========================================================
+
+function formatarTelefone(v) {
+  if (!v) return "";
+  v = v.replace(/\D/g, "").slice(0, 11);
+  if (v.length > 10) {
+    return v.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+  } else if (v.length > 6) {
+    return v.replace(/^(\d{2})(\d{4})(\d{0,4})$/, "($1) $2-$3");
+  } else if (v.length > 2) {
+    return v.replace(/^(\d{2})(\d{0,5})$/, "($1) $2");
+  } else if (v.length > 0) {
+    return v.replace(/^(\d*)$/, "($1");
+  }
+  return "";
+}
+
+function formatarCEP(v) {
+  if (!v) return "";
+  v = v.replace(/\D/g, "").slice(0, 8);
+  if (v.length > 5) {
+    return v.replace(/^(\d{5})(\d{1,3})$/, "$1-$2");
+  }
+  return v;
+}
+
+function formatarCpfCnpj(v) {
+  if (!v) return "";
+  v = v.replace(/\D/g, "").slice(0, 14);
+  if (v.length > 11) {
+    return v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{1,2})$/, "$1.$2.$3/$4-$5")
+            .replace(/^(\d{2})(\d{3})(\d{3})(\d{1,4})$/, "$1.$2.$3/$4")
+            .replace(/^(\d{2})(\d{3})(\d{1,3})$/, "$1.$2.$3")
+            .replace(/^(\d{2})(\d{1,3})$/, "$1.$2");
+  } else {
+    return v.replace(/^(\d{3})(\d{3})(\d{3})(\d{1,2})$/, "$1.$2.$3-$4")
+            .replace(/^(\d{3})(\d{3})(\d{1,3})$/, "$1.$2.$3")
+            .replace(/^(\d{3})(\d{1,3})$/, "$1.$2");
+  }
+}
+
+function formatarRG(v) {
+  if (!v) return "";
+  v = v.replace(/[^0-9a-zA-Z]/g, "").slice(0, 10);
+  if (v.length > 8) {
+    return v.replace(/^(\d{2})(\d{3})(\d{3})([0-9a-zA-Z]{1,2})$/, "$1.$2.$3-$4");
+  } else if (v.length > 5) {
+    return v.replace(/^(\d{2})(\d{3})(\d{1,3})$/, "$1.$2.$3");
+  } else if (v.length > 2) {
+    return v.replace(/^(\d{2})(\d{1,3})$/, "$1.$2");
+  }
+  return v;
+}
+
+function aplicarMascara(id, formatador, callback) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  const handler = () => {
+    const raw = el.value;
+    const formatado = formatador(raw);
+    if (el.value !== formatado) {
+      el.value = formatado;
+    }
+    if (callback) {
+      callback(formatado);
+    }
+  };
+
+  el.addEventListener("input", handler);
+  el.addEventListener("blur", handler);
+}
+
+// Consulta gratuita de CEP via API pública ViaCEP
+async function buscarEnderecoPorCep(cepRaw) {
+  const digits = (cepRaw || "").replace(/\D/g, "");
+  if (digits.length !== 8) return;
+
+  const statusEl = document.getElementById("cep-status-msg");
+  if (statusEl) {
+    statusEl.innerText = "⏳ Buscando CEP...";
+    statusEl.style.color = "#2563eb";
+    statusEl.style.display = "inline";
+  }
+
+  try {
+    const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+    if (!res.ok) throw new Error("Erro na requisição ViaCEP");
+    const data = await res.json();
+
+    if (data.erro) {
+      if (statusEl) {
+        statusEl.innerText = "⚠️ CEP não encontrado";
+        statusEl.style.color = "#dc2626";
+        setTimeout(() => { if (statusEl) statusEl.style.display = "none"; }, 3000);
+      }
+      return;
+    }
+
+    // Preenche os campos do formulário e o estado da aplicação
+    if (data.logradouro) {
+      appData.orcamentoAtual.cliente.endereco = data.logradouro;
+      const fEnd = document.getElementById("f-cli-endereco");
+      if (fEnd) fEnd.value = data.logradouro;
+    }
+    if (data.bairro) {
+      appData.orcamentoAtual.cliente.bairro = data.bairro;
+      const fBai = document.getElementById("f-cli-bairro");
+      if (fBai) fBai.value = data.bairro;
+    }
+    if (data.localidade) {
+      appData.orcamentoAtual.cliente.cidade = data.localidade;
+      const fCid = document.getElementById("f-cli-cidade");
+      if (fCid) fCid.value = data.localidade;
+    }
+    if (data.uf) {
+      appData.orcamentoAtual.cliente.estado = data.uf;
+      const fEst = document.getElementById("f-cli-estado");
+      if (fEst) fEst.value = data.uf;
+    }
+
+    if (statusEl) {
+      statusEl.innerText = "✓ Endereço preenchido!";
+      statusEl.style.color = "#16a34a";
+      setTimeout(() => { if (statusEl) statusEl.style.display = "none"; }, 2500);
+    }
+
+    atualizarPreview();
+    salvarDadosLocais();
+
+    // Move o foco para o campo Número para agilizar digitação
+    const inputNumero = document.getElementById("f-cli-numero");
+    if (inputNumero) {
+      inputNumero.focus();
+    }
+  } catch (err) {
+    console.warn("Erro ao buscar ViaCEP:", err);
+    if (statusEl) {
+      statusEl.innerText = "⚠️ Falha ao buscar CEP";
+      statusEl.style.color = "#dc2626";
+      setTimeout(() => { if (statusEl) statusEl.style.display = "none"; }, 3000);
+    }
+  }
+}
+
+function configurarMascaras() {
+  // CEP: 00000-000 + Consulta ViaCEP
+  aplicarMascara("f-cli-cep", formatarCEP, (val) => {
+    appData.orcamentoAtual.cliente.cep = val;
+    atualizarPreview();
+    salvarDadosLocais();
+    const clean = val.replace(/\D/g, "");
+    if (clean.length === 8) {
+      buscarEnderecoPorCep(clean);
+    }
+  });
+
+  // CPF / CNPJ: 000.000.000-00 ou 00.000.000/0000-00
+  aplicarMascara("f-cli-cpfcnpj", formatarCpfCnpj, (val) => {
+    appData.orcamentoAtual.cliente.cpfCnpj = val;
+    atualizarPreview();
+    salvarDadosLocais();
+  });
+
+  // Telefone Celular: (00) 00000-0000
+  aplicarMascara("f-cli-fonecel", formatarTelefone, (val) => {
+    appData.orcamentoAtual.cliente.foneCel = val;
+    atualizarPreview();
+    salvarDadosLocais();
+  });
+
+  // Telefone Residencial: (00) 0000-0000 ou (00) 00000-0000
+  aplicarMascara("f-cli-foneres", formatarTelefone, (val) => {
+    appData.orcamentoAtual.cliente.foneRes = val;
+    atualizarPreview();
+    salvarDadosLocais();
+  });
+
+  // Telefone Comercial: (00) 0000-0000 ou (00) 00000-0000
+  aplicarMascara("f-cli-fonecom", formatarTelefone, (val) => {
+    appData.orcamentoAtual.cliente.foneCom = val;
+    atualizarPreview();
+    salvarDadosLocais();
+  });
+
+  // RG: 00.000.000-0
+  aplicarMascara("f-cli-rg", formatarRG, (val) => {
+    appData.orcamentoAtual.cliente.rg = val;
+    atualizarPreview();
+    salvarDadosLocais();
+  });
 }
 
 // Registro do Service Worker para funcionamento 100% Offline e PWA no Android

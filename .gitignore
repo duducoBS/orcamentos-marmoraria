@@ -12,6 +12,11 @@ test_*.html
 diag.html
 teste_*.pdf
 
+# IDEs
+.idea/
+*.iml
+.vscode/
+
 # OS generated
 Thumbs.db
 Desktop.ini
