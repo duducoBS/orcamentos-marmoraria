@@ -8,7 +8,9 @@ using Android.Webkit;
 namespace OrcamentosMarmoraria;
 
 [Activity(
-    Label = "Orçamentos Marmoraria",
+    Label = "Orçamentos",
+    Icon = "@mipmap/appicon",
+    RoundIcon = "@mipmap/appicon_round",
     MainLauncher = true,
     Theme = "@android:style/Theme.NoTitleBar.Fullscreen",
     ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize
@@ -39,16 +41,42 @@ public class MainActivity : Activity
         settings.SetSupportZoom(true);
         settings.BuiltInZoomControls = true;
         settings.DisplayZoomControls = false;
+        settings.UseWideViewPort = true;
+        settings.LoadWithOverviewMode = true;
 
         _webView.SetWebViewClient(new CustomWebViewClient(this));
         _webView.SetWebChromeClient(new CustomWebChromeClient(this));
 
-        // Expõe interface JavaScript para impressão nativa do Android
         _webView.AddJavascriptInterface(new AndroidPrintInterface(this, _webView), "AndroidPrinter");
 
         SetContentView(_webView);
 
         _webView.LoadUrl("file:///android_asset/www/index.html");
+    }
+
+    public void PrintDocument()
+    {
+        RunOnUiThread(() =>
+        {
+            try
+            {
+                var printManager = (PrintManager?)GetSystemService(Context.PrintService);
+                if (printManager != null && _webView != null)
+                {
+                    var printAdapter = _webView.CreatePrintDocumentAdapter("Orcamento_Marmoraria");
+                    var printAttributes = new PrintAttributes.Builder()
+                        .SetMediaSize(PrintAttributes.MediaSize.IsoA4)
+                        .SetMinMargins(PrintAttributes.Margins.NoMargins)
+                        .Build();
+
+                    printManager.Print("Orçamento Marmoraria", printAdapter, printAttributes);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Android.Widget.Toast.MakeText(this, "Erro ao abrir impressão: " + ex.Message, Android.Widget.ToastLength.Long)?.Show();
+            }
+        });
     }
 
     public override bool OnKeyDown(Keycode keyCode, KeyEvent? e)
@@ -76,9 +104,9 @@ public class MainActivity : Activity
 
 public class CustomWebViewClient : WebViewClient
 {
-    private readonly Activity _activity;
+    private readonly MainActivity _activity;
 
-    public CustomWebViewClient(Activity activity)
+    public CustomWebViewClient(MainActivity activity)
     {
         _activity = activity;
     }
@@ -86,7 +114,23 @@ public class CustomWebViewClient : WebViewClient
     public override bool ShouldOverrideUrlLoading(WebView? view, IWebResourceRequest? request)
     {
         if (request?.Url == null) return false;
-        var url = request.Url.ToString();
+        return HandleCustomUrl(request.Url.ToString());
+    }
+
+    public override bool ShouldOverrideUrlLoading(WebView? view, string? url)
+    {
+        if (string.IsNullOrEmpty(url)) return false;
+        return HandleCustomUrl(url);
+    }
+
+    private bool HandleCustomUrl(string url)
+    {
+        // Intercepta comando de impressão nativa
+        if (url.StartsWith("app://print") || url.StartsWith("action://print"))
+        {
+            _activity.PrintDocument();
+            return true;
+        }
 
         // Links de WhatsApp ou externos abrem no aplicativo nativo
         if (url.StartsWith("whatsapp://") || url.Contains("api.whatsapp.com") || url.Contains("wa.me"))
@@ -99,7 +143,6 @@ public class CustomWebViewClient : WebViewClient
             }
             catch
             {
-                // Se não tiver WhatsApp instalado, abre no navegador padrão
                 var intent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(url));
                 _activity.StartActivity(intent);
                 return true;
@@ -112,20 +155,32 @@ public class CustomWebViewClient : WebViewClient
 
 public class CustomWebChromeClient : WebChromeClient
 {
-    private readonly Activity _activity;
+    private readonly MainActivity _activity;
 
-    public CustomWebChromeClient(Activity activity)
+    public CustomWebChromeClient(MainActivity activity)
     {
         _activity = activity;
+    }
+
+    // Interceptação via JS Prompt (bridge 100% compatível em todas as versões do Android)
+    public override bool OnJsPrompt(WebView? view, string? url, string? message, string? defaultValue, JsPromptResult? result)
+    {
+        if (message == "ANDROID_PRINT")
+        {
+            _activity.PrintDocument();
+            result?.Confirm("OK");
+            return true;
+        }
+        return base.OnJsPrompt(view, url, message, defaultValue, result);
     }
 }
 
 public class AndroidPrintInterface : Java.Lang.Object
 {
-    private readonly Activity _activity;
+    private readonly MainActivity _activity;
     private readonly WebView _webView;
 
-    public AndroidPrintInterface(Activity activity, WebView webView)
+    public AndroidPrintInterface(MainActivity activity, WebView webView)
     {
         _activity = activity;
         _webView = webView;
@@ -134,15 +189,7 @@ public class AndroidPrintInterface : Java.Lang.Object
     [JavascriptInterface]
     public void Print()
     {
-        _activity.RunOnUiThread(() =>
-        {
-            var printManager = (PrintManager?)_activity.GetSystemService(Context.PrintService);
-            if (printManager != null)
-            {
-                var printAdapter = _webView.CreatePrintDocumentAdapter("Orcamento_Marmoraria");
-                printManager.Print("Orçamento Marmoraria", printAdapter, new PrintAttributes.Builder().Build());
-            }
-        });
+        _activity.PrintDocument();
     }
 }
 

@@ -845,6 +845,43 @@ function executarImpressao() {
   }
 }
 
+// Execução de impressão com suporte nativo ao Android e navegadores
+function executarImpressao() {
+  // Se estiver no celular, muda para a aba de prévia da folha para renderizar o layout completo
+  alternarAbaMobile('preview');
+
+  // Aguarda o DOM da prévia posicionar
+  setTimeout(() => {
+    // 1. Tenta via prompt bridge do WebView nativo (funciona 100% no APK Android)
+    try {
+      if (typeof window.prompt === 'function') {
+        const handled = window.prompt("ANDROID_PRINT");
+        if (handled === "OK") return;
+      }
+    } catch (e) {
+      console.warn("Prompt bridge falhou:", e);
+    }
+
+    // 2. Tenta via URL scheme interceptado pelo WebView
+    try {
+      window.location.href = "app://print";
+    } catch (e) {}
+
+    // 3. Tenta via interface JavascriptInterface
+    try {
+      if (window.AndroidPrinter && typeof window.AndroidPrinter.Print === 'function') {
+        window.AndroidPrinter.Print();
+        return;
+      }
+    } catch (e) {}
+
+    // 4. Fallback para navegadores comuns (Desktop Chrome/Edge ou Chrome Mobile PWA)
+    setTimeout(() => {
+      window.print();
+    }, 150);
+  }, 120);
+}
+
 // Utilitário para escapar caracteres HTML
 function escapeHtml(text) {
   if (!text) return "";
