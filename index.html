@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sistema de Orçamentos - Marmoraria</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="tab-form-active">
+
+  <!-- BARRA DE NAVEGAÇÃO SUPERIOR -->
+  <header class="top-navbar no-print">
+    <div class="brand">
+      <span class="brand-icon">📐</span>
+      <h1>Orçamentos</h1>
+    </div>
+    <div class="nav-actions">
+      <button type="button" class="btn btn-whatsapp" id="btn-whatsapp" onclick="enviarWhatsApp()" title="Enviar Orçamento pelo WhatsApp">
+        📲 WhatsApp
+      </button>
+      <button type="button" class="btn btn-secondary" id="btn-novo-orcamento">
+        ➕ Novo
+      </button>
+      <button type="button" class="btn btn-success" id="btn-salvar-orcamento">
+        💾 Salvar
+      </button>
+      <button type="button" class="btn btn-secondary" id="btn-historico">
+        📁 Histórico
+      </button>
+      <button type="button" class="btn btn-secondary" id="btn-empresa-config">
+        ⚙️ Empresa
+      </button>
+      <button type="button" class="btn btn-print" id="btn-imprimir">
+        🖨️ Imprimir / PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- ÁREA PRINCIPAL DIVIDIDA -->
+  <main class="main-container">
+    
+    <!-- PAINEL ESQUERDO: FORMULÁRIO DE ENTRADA -->
+    <aside class="form-panel no-print">
+      
+      <!-- IDENTIFICAÇÃO DO ORÇAMENTO -->
+      <section class="section-card">
+        <h2 class="section-title">
+          <span>Identificação do Orçamento</span>
+        </h2>
+        <div class="form-grid">
+          <div class="form-group col-4">
+            <label for="f-numero">Nº Orçamento</label>
+            <input type="text" id="f-numero" class="form-control" placeholder="116">
+          </div>
+          <div class="form-group col-4">
+            <label for="f-cidade">Cidade</label>
+            <input type="text" id="f-cidade" class="form-control" placeholder="São Paulo">
+          </div>
+          <div class="form-group col-4">
+            <label for="f-data">Data</label>
+            <input type="date" id="f-data" class="form-control">
+          </div>
+        </div>
+      </section>
+
+      <!-- DADOS DO CLIENTE -->
+      <section class="section-card">
+        <h2 class="section-title">
+          <span>Dados do Cliente</span>
+        </h2>
+        <div class="form-grid">
+          <div class="form-group col-8">
+            <label for="f-cli-nome">Nome do Cliente / Obra</label>
+            <input type="text" id="f-cli-nome" class="form-control" placeholder="Ex: Nome do Cliente / Obra">
+          </div>
+          <div class="form-group col-4">
+            <label for="f-cli-cpfcnpj">CPF / CNPJ</label>
+            <input type="text" id="f-cli-cpfcnpj" class="form-control" placeholder="00.000.000/0000-00">
+          </div>
+
+          <div class="form-group col-8">
+            <label for="f-cli-endereco">Endereço</label>
+            <input type="text" id="f-cli-endereco" class="form-control" placeholder="Rua / Av, Número, Complemento">
+          </div>
+          <div class="form-group col-4">
+            <label for="f-cli-bairro">Bairro</label>
+            <input type="text" id="f-cli-bairro" class="form-control" placeholder="Bairro">
+          </div>
+
+          <div class="form-group col-4">
+            <label for="f-cli-cep">CEP</label>
+            <input type="text" id="f-cli-cep" class="form-control" placeholder="00000-000">
+          </div>
+          <div class="form-group col-5">
+            <label for="f-cli-cidade">Cidade</label>
+            <input type="text" id="f-cli-cidade" class="form-control" placeholder="Cidade">
+          </div>
+          <div class="form-group col-3">
+            <label for="f-cli-estado">Estado (UF)</label>
+            <input type="text" id="f-cli-estado" class="form-control" placeholder="SP">
+          </div>
+
+          <div class="form-group col-4">
+            <label for="f-cli-fonecel">Telefone Celular</label>
+            <input type="text" id="f-cli-fonecel" class="form-control" placeholder="(11) 98765-4321">
+          </div>
+          <div class="form-group col-4">
+            <label for="f-cli-foneres">Telefone Residencial</label>
+            <input type="text" id="f-cli-foneres" class="form-control" placeholder="(11) 0000-0000">
+          </div>
+          <div class="form-group col-4">
+            <label for="f-cli-fonecom">Telefone Comercial</label>
+            <input type="text" id="f-cli-fonecom" class="form-control" placeholder="(11) 0000-0000">
+          </div>
+
+          <div class="form-group col-6">
+            <label for="f-cli-email">E-mail</label>
+            <input type="email" id="f-cli-email" class="form-control" placeholder="cliente@email.com">
+          </div>
+          <div class="form-group col-6">
+            <label for="f-cli-rg">RG</label>
+            <input type="text" id="f-cli-rg" class="form-control" placeholder="00.000.000-0">
+          </div>
+
+          <div class="form-group col-12">
+            <label for="f-cli-condpag">Condições de Pagamento</label>
+            <input type="text" id="f-cli-condpag" class="form-control" placeholder="Ex: à vista na colocação, 50% entrada + 50% entrega">
+          </div>
+        </div>
+      </section>
+
+      <!-- TABELA DE ITENS / MERCADORIAS -->
+      <section class="section-card">
+        <div class="section-title">
+          <span>Itens do Orçamento</span>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-adicionar-item">
+            + Adicionar Item
+          </button>
+        </div>
+        
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">Qtd</th>
+              <th>Descrição da Mercadoria</th>
+              <th style="width: 130px;">Acabamento</th>
+              <th style="width: 120px;">Cor / Material</th>
+              <th style="width: 100px;">Valor (R$)</th>
+              <th style="width: 36px;"></th>
+            </tr>
+          </thead>
+          <tbody id="itens-form-tbody">
+            <!-- Gerado dinamicamente -->
+          </tbody>
+        </table>
+      </section>
+
+      <!-- PARCELAMENTO E PAGAMENTO -->
+      <section class="section-card">
+        <div class="section-title">
+          <span>Condições de Parcelamento</span>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-gerar-parcelas">
+              ⚡ Gerar Automático
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-adicionar-parcela">
+              + Parcela
+            </button>
+          </div>
+        </div>
+
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th style="width: 45px; text-align: center;">Nº</th>
+              <th>Valor (R$)</th>
+              <th>Vencimento</th>
+              <th style="width: 36px;"></th>
+            </tr>
+          </thead>
+          <tbody id="parcelas-form-tbody">
+            <!-- Gerado dinamicamente -->
+          </tbody>
+        </table>
+      </section>
+
+      <!-- OBSERVAÇÕES E DADOS BANCÁRIOS -->
+      <section class="section-card">
+        <h2 class="section-title">
+          <span>Observações & Dados Bancários</span>
+        </h2>
+        <div class="form-grid">
+          <div class="form-group col-12">
+            <label for="f-observacoes">Observações do Orçamento (em vermelho no documento)</label>
+            <textarea id="f-observacoes" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-group col-12">
+            <label for="f-dadosbancarios">Dados Bancários / PIX no Rodapé</label>
+            <textarea id="f-dadosbancarios" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+      </section>
+
+    </aside>
+
+    <!-- PAINEL DIREITO: PRÉVIA AO VIVO DA FOLHA A4 -->
+    <section class="preview-panel">
+      
+      <div class="preview-toolbar no-print">
+        <span>📄 Prévia da Folha A4</span>
+        <label for="preview-zoom" style="font-size: 0.8rem; margin-left: 10px;">Zoom:</label>
+        <select id="preview-zoom" class="form-control" style="width: 85px; padding: 2px 6px; font-size: 0.8rem;">
+          <option value="0.7">70%</option>
+          <option value="0.8" selected>80%</option>
+          <option value="0.9">90%</option>
+          <option value="1.0">100%</option>
+        </select>
+        <button type="button" class="btn btn-whatsapp btn-sm" onclick="enviarWhatsApp()" title="Enviar pelo WhatsApp">
+          📲 WhatsApp
+        </button>
+        <button type="button" class="btn btn-print btn-sm" onclick="executarImpressao()">
+          🖨️ Imprimir / PDF
+        </button>
+      </div>
+
+      <!-- =========================================================
+           DOCUMENTO A4 IMPRESSO (LAYOUT IDÊNTICO AO EXEMPLO FORNECIDO)
+           ========================================================= -->
+      <div class="a4-sheet" id="a4-sheet-document" style="transform: scale(0.8); margin-bottom: -60px;">
+        
+        <!-- 1. CABEÇALHO DA EMPRESA -->
+        <header class="orc-header">
+          <div class="header-left">
+            <img src="logo.png" alt="Edu Mármores & Granitos" class="header-logo-img" id="p-emp-logo-img">
+          </div>
+          <div class="header-right">
+            <div class="specialties-list" id="p-emp-especialidades">
+              <div>MÁRMORES - GRANITOS</div>
+              <div>PEDRAS DECORATIVAS</div>
+              <div>PIAS - LAVATÓRIOS - PISOS</div>
+              <div>ESCADAS - SOLEIRAS - ETC.</div>
+            </div>
+            <div class="header-phones" id="p-emp-phones-container">
+              <div class="phone-contact">
+                <span class="phone-number" id="p-emp-fone1">94031-1110</span>
+                <span class="person-name" id="p-emp-resp1">Edu</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- 2. DATA E NÚMERO DO ORÇAMENTO -->
+        <div class="orc-meta-bar">
+          <div class="orc-meta-date" id="p-data-extenso">
+            São Paulo, 21 de janeiro de 2021
+          </div>
+          <div class="orc-meta-title">
+            ORÇAMENTO Nº:
+          </div>
+          <div class="orc-meta-number" id="p-numero">
+            116
+          </div>
+        </div>
+
+        <!-- 3. DADOS DO CLIENTE -->
+        <table class="client-info-table">
+          <tbody>
+            <tr>
+              <td colspan="4"><span class="lbl">Nome: </span><span class="val" id="p-cli-nome"></span></td>
+            </tr>
+            <tr>
+              <td colspan="4"><span class="lbl">Endereço: </span><span class="val" id="p-cli-endereco"></span></td>
+            </tr>
+            <tr>
+              <td style="width: 28%;"><span class="lbl">Bairro: </span><span class="val" id="p-cli-bairro"></span></td>
+              <td style="width: 24%;"><span class="lbl">CEP: </span><span class="val" id="p-cli-cep"></span></td>
+              <td style="width: 33%;"><span class="lbl">Cidade: </span><span class="val" id="p-cli-cidade"></span></td>
+              <td style="width: 15%;"><span class="lbl">Estado: </span><span class="val" id="p-cli-estado"></span></td>
+            </tr>
+            <tr>
+              <td style="width: 28%;"><span class="lbl">Fone Res.: </span><span class="val" id="p-cli-foneres"></span></td>
+              <td colspan="2"><span class="lbl">Fone Cel.: </span><span class="val" id="p-cli-fonecel"></span></td>
+              <td><span class="lbl">Fone Com.: </span><span class="val" id="p-cli-fonecom"></span></td>
+            </tr>
+            <tr>
+              <td colspan="4"><span class="lbl">Email: </span><span class="val" id="p-cli-email"></span></td>
+            </tr>
+            <tr>
+              <td colspan="2"><span class="lbl">CPF/CNPJ: </span><span class="val" id="p-cli-cpfcnpj"></span></td>
+              <td colspan="2"><span class="lbl">RG: </span><span class="val" id="p-cli-rg"></span></td>
+            </tr>
+            <tr>
+              <td colspan="4"><span class="lbl">Condições de pagam.: </span><span class="val" id="p-cli-condpag"></span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- 4. TABELA DE ITENS / MERCADORIAS -->
+        <div class="products-table-container">
+          <table class="products-table">
+            <thead>
+              <tr>
+                <th class="col-qtd">Quantidade</th>
+                <th class="col-desc">Descrição da Mercadoria</th>
+                <th class="col-acab">Acabamento<br>Nº</th>
+                <th class="col-cor">Cor</th>
+                <th class="col-val">Valor</th>
+              </tr>
+            </thead>
+            <tbody id="p-itens-tbody">
+              <!-- Itens preenchidos via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 5. SEÇÃO DE ILUSTRAÇÕES DE ACABAMENTOS (BORDAS E COLUNAS) -->
+        <div class="acabamentos-section">
+          <div class="acabamentos-grid">
+            
+            <!-- Grupo 1: Simples 2.0 cm -->
+            <div class="acab-group">
+              <div class="acab-header">
+                Simples com 2,0 cm de borda<br>
+                <span class="sub">para soleiras, pingadeiras balcões, lavatórios, etc</span>
+              </div>
+              <div class="acab-items-list" id="acab-simples-list">
+                <!-- Gerado por acabamentos.js -->
+              </div>
+            </div>
+
+            <!-- Grupo 2: Engrossado 4.0 cm -->
+            <div class="acab-group">
+              <div class="acab-header">
+                Acabamento engrossado com 4,0 cm de borda<br>
+                <span class="sub">usado para pias, balcões, lavatórios, etc.</span>
+              </div>
+              <div class="acab-items-list" id="acab-engrossado-list">
+                <!-- Gerado por acabamentos.js -->
+              </div>
+            </div>
+
+            <!-- Grupo 3: 45º com saia -->
+            <div class="acab-group">
+              <div class="acab-header">
+                Acabamento 45º com saia<br>
+                <span class="sub">a partir de 6,0 cm de borda.</span>
+              </div>
+              <div class="acab-items-list" id="acab-saia-list">
+                <!-- Gerado por acabamentos.js -->
+              </div>
+            </div>
+
+            <!-- Grupo 4: Colunas -->
+            <div class="acab-group">
+              <div class="acab-header">
+                Colunas
+              </div>
+              <div class="columns-diagram-container" id="colunas-diagram-box">
+                <!-- Gerado por acabamentos.js -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 6. SEÇÃO FINANCEIRA: PARCELAS, TOTAL E OBSERVAÇÕES -->
+        <div class="financial-section">
+          <div class="parcelas-box">
+            <table class="parcelas-table">
+              <thead>
+                <tr>
+                  <th style="width: 45px;">parcela</th>
+                  <th style="width: 65px;">valor</th>
+                  <th>vencimento</th>
+                </tr>
+              </thead>
+              <tbody id="p-parcelas-tbody">
+                <!-- Parcelas preenchidas via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+          <div class="total-and-obs">
+            <div class="total-row">
+              <span class="total-title">Valor total :</span>
+              <span class="total-currency">R$</span>
+              <span class="total-value-display" id="p-total-valor">860,00</span>
+            </div>
+            <div class="obs-row" id="p-obs-container">
+              <div class="obs-box">
+                OBS: Material para instalação será por conta do cliente
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. BLOCO DE FECHAMENTO (ASSINATURAS E DADOS BANCÁRIOS) -->
+        <div class="orc-footer-block">
+          <div class="signatures-section">
+            <div class="sign-line">VENDEDOR</div>
+            <div class="sign-line">COMPRADOR</div>
+          </div>
+
+          <!-- 8. DADOS BANCÁRIOS / PIX NO RODAPÉ -->
+          <footer class="bank-details-footer" id="p-dadosbancarios">
+            Dados Bancarios: Caixa Econômica Agencia:242/ operação 013/ conta poupança 7675-7/ CPF:148.374.878-23 Cicero Eduardo dos Santos
+          </footer>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- MODAL: HISTÓRICO DE ORÇAMENTOS -->
+  <div class="modal-backdrop" id="modal-historico">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📁 Histórico de Orçamentos Salvos</h2>
+        <button type="button" class="modal-close" onclick="fecharModalHistorico()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="historico-lista">
+          <!-- Lista gerada dinamicamente -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <label class="btn btn-secondary btn-sm" style="margin-right: auto; cursor: pointer;">
+          📥 Importar Backup JSON
+          <input type="file" accept=".json" style="display: none;" onchange="importarDadosJson(event)">
+        </label>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="exportarDadosJson()">
+          📤 Exportar Backup JSON
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="fecharModalHistorico()">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIGURAÇÕES DA EMPRESA -->
+  <div class="modal-backdrop" id="modal-empresa">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>⚙️ Configurações da Marmoraria</h2>
+        <button type="button" class="modal-close" onclick="fecharModalEmpresa()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group col-4">
+            <label for="cfg-logotexto">Texto do Logo (Símbolo)</label>
+            <input type="text" id="cfg-logotexto" class="form-control" placeholder="Edu">
+          </div>
+          <div class="form-group col-8">
+            <label for="cfg-nome">Nome Comercial</label>
+            <input type="text" id="cfg-nome" class="form-control" placeholder="MÁRMORES & GRANITOS">
+          </div>
+          <div class="form-group col-6">
+            <label for="cfg-cnpj">CNPJ da Empresa</label>
+            <input type="text" id="cfg-cnpj" class="form-control" placeholder="00.000.000/0001-00">
+          </div>
+          <div class="form-group col-6">
+            <label for="cfg-cidadepadrao">Cidade Padrão</label>
+            <input type="text" id="cfg-cidadepadrao" class="form-control" placeholder="São Paulo">
+          </div>
+          <div class="form-group col-12">
+            <label for="cfg-endereco">Endereço Completo</label>
+            <input type="text" id="cfg-endereco" class="form-control">
+          </div>
+          <div class="form-group col-6">
+            <label for="cfg-fone1">Telefone Principal</label>
+            <input type="text" id="cfg-fone1" class="form-control" placeholder="94031-1110">
+          </div>
+          <div class="form-group col-6">
+            <label for="cfg-resp1">Responsável</label>
+            <input type="text" id="cfg-resp1" class="form-control" placeholder="Edu">
+          </div>
+          <div class="form-group col-6">
+            <label for="cfg-fone2">Telefone Secundário (Opcional)</label>
+            <input type="text" id="cfg-fone2" class="form-control" placeholder="Deixe em branco se não houver">
+          </div>
+          <div class="form-group col-6">
+            <label for="cfg-resp2">Responsável Secundário (Opcional)</label>
+            <input type="text" id="cfg-resp2" class="form-control" placeholder="Deixe em branco se não houver">
+          </div>
+          <div class="form-group col-12">
+            <label for="cfg-especialidades">Especialidades / Serviços (uma por linha)</label>
+            <textarea id="cfg-especialidades" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="form-group col-12">
+            <label for="cfg-dadosbancarios">Dados Bancários / PIX Padrão (Rodapé)</label>
+            <textarea id="cfg-dadosbancarios" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-group col-12">
+            <label for="cfg-observacoespadrao">Observação Padrão do Orçamento</label>
+            <input type="text" id="cfg-observacoespadrao" class="form-control">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="fecharModalEmpresa()">Cancelar</button>
+        <button type="button" class="btn btn-success" onclick="salvarConfiguracoesEmpresa()">Salvar Configurações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA INFERIOR DE ABAS PARA CELULAR / ANDROID -->
+  <nav class="mobile-bottom-nav no-print" id="mobile-nav">
+    <button type="button" class="mobile-nav-tab active" id="tab-btn-form" onclick="alternarAbaMobile('form')">
+      <span class="tab-icon">📝</span>
+      <span class="tab-label">Formulário</span>
+    </button>
+    <button type="button" class="mobile-nav-tab" id="tab-btn-preview" onclick="alternarAbaMobile('preview')">
+      <span class="tab-icon">📄</span>
+      <span class="tab-label">Folha / PDF</span>
+    </button>
+    <button type="button" class="mobile-nav-tab btn-tab-zap" onclick="enviarWhatsApp()">
+      <span class="tab-icon">📲</span>
+      <span class="tab-label">WhatsApp</span>
+    </button>
+    <button type="button" class="mobile-nav-tab" onclick="executarImpressao()">
+      <span class="tab-icon">🖨️</span>
+      <span class="tab-label">Gerar PDF</span>
+    </button>
+  </nav>
+
+  <!-- SCRIPTS -->
+  <script src="acabamentos.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

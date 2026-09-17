@@ -1,0 +1,18 @@
+# Build & Object files (.NET / Android)
+bin/
+obj/
+AndroidApp/bin/
+AndroidApp/obj/
+.vs/
+
+# Logs e arquivos temporários
+*.log
+output*.pdf
+test_*.html
+diag.html
+teste_*.pdf
+
+# OS generated
+Thumbs.db
+Desktop.ini
+.DS_Store
