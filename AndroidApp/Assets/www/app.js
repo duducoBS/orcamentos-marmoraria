@@ -25,18 +25,40 @@ let appData = {
 
 // Inicialização
 document.addEventListener("DOMContentLoaded", () => {
-  carregarDadosLocais();
-  renderizarAcabamentosNaFolha();
-  
-  if (!appData.orcamentoAtual) {
-    novoOrcamento(false);
-  } else {
-    preencherFormulario();
-    atualizarPreview();
+  try {
+    carregarDadosLocais();
+  } catch (e) {
+    console.error("Erro ao carregar dados locais:", e);
   }
 
-  configurarEventos();
-  configurarMascaras();
+  try {
+    renderizarAcabamentosNaFolha();
+  } catch (e) {
+    console.error("Erro ao renderizar acabamentos:", e);
+  }
+  
+  try {
+    if (!appData.orcamentoAtual) {
+      novoOrcamento(false);
+    } else {
+      preencherFormulario();
+      atualizarPreview();
+    }
+  } catch (e) {
+    console.error("Erro ao inicializar orçamento:", e);
+  }
+
+  try {
+    configurarEventos();
+  } catch (e) {
+    console.error("Erro ao configurar eventos:", e);
+  }
+
+  try {
+    configurarMascaras();
+  } catch (e) {
+    console.error("Erro ao configurar máscaras:", e);
+  }
 });
 
 // Carrega configurações e orçamentos do LocalStorage
@@ -163,62 +185,75 @@ function obterProximoNumeroOrcamento() {
 
 // Renderiza a grade de acabamentos na folha A4 com os SVGs
 function renderizarAcabamentosNaFolha() {
-  // Simples 2.0cm
-  const s2cm = [
-    { num: "01-RETO", svg: ACABAMENTOS_SVG["01"] },
-    { num: "02-CHANFRADO", svg: ACABAMENTOS_SVG["02"] },
-    { num: "03-MEIA CANA", svg: ACABAMENTOS_SVG["03"] },
-    { num: "04-BOLEADO", svg: ACABAMENTOS_SVG["04"] },
-    { num: "05-PEITO DE POMBO", svg: ACABAMENTOS_SVG["05"] }
-  ];
-  document.getElementById("acab-simples-list").innerHTML = s2cm.map(item => `
-    <div class="acab-item-row">
-      <span>${item.num}</span>
-      <div class="acab-item-svg">${item.svg}</div>
-    </div>
-  `).join("");
+  if (typeof ACABAMENTOS_SVG === 'undefined' || !ACABAMENTOS_SVG) {
+    console.warn("ACABAMENTOS_SVG não disponível.");
+    return;
+  }
 
-  // Engrossado 4.0cm
-  const e4cm = [
-    { num: "06-RETO", svg: ACABAMENTOS_SVG["06"] },
-    { num: "07-1/2 CANA", svg: ACABAMENTOS_SVG["07"] },
-    { num: "08-CHANFRADO SIMPLES", svg: ACABAMENTOS_SVG["08"] },
-    { num: "09-BOLEADO DUPLO", svg: ACABAMENTOS_SVG["09"] }
-  ];
-  document.getElementById("acab-engrossado-list").innerHTML = e4cm.map(item => `
-    <div class="acab-item-row">
-      <span>${item.num}</span>
-      <div class="acab-item-svg">${item.svg}</div>
-    </div>
-  `).join("");
+  const s2El = document.getElementById("acab-simples-list");
+  if (s2El) {
+    const s2cm = [
+      { num: "01-RETO", svg: ACABAMENTOS_SVG["01"] || "" },
+      { num: "02-CHANFRADO", svg: ACABAMENTOS_SVG["02"] || "" },
+      { num: "03-MEIA CANA", svg: ACABAMENTOS_SVG["03"] || "" },
+      { num: "04-BOLEADO", svg: ACABAMENTOS_SVG["04"] || "" },
+      { num: "05-PEITO DE POMBO", svg: ACABAMENTOS_SVG["05"] || "" }
+    ];
+    s2El.innerHTML = s2cm.map(item => `
+      <div class="acab-item-row">
+        <span>${item.num}</span>
+        <div class="acab-item-svg">${item.svg}</div>
+      </div>
+    `).join("");
+  }
 
-  // 45º com saia
-  const saia45 = [
-    { num: "10-45º", svg: ACABAMENTOS_SVG["10"] },
-    { num: "11-OUTROS DESENHOS", svg: ACABAMENTOS_SVG["11"] }
-  ];
-  document.getElementById("acab-saia-list").innerHTML = saia45.map(item => `
-    <div class="acab-item-row">
-      <span>${item.num}</span>
-      <div class="acab-item-svg" style="height: 18px;">${item.svg}</div>
-    </div>
-  `).join("");
+  const e4El = document.getElementById("acab-engrossado-list");
+  if (e4El) {
+    const e4cm = [
+      { num: "06-RETO", svg: ACABAMENTOS_SVG["06"] || "" },
+      { num: "07-1/2 CANA", svg: ACABAMENTOS_SVG["07"] || "" },
+      { num: "08-CHANFRADO SIMPLES", svg: ACABAMENTOS_SVG["08"] || "" },
+      { num: "09-BOLEADO DUPLO", svg: ACABAMENTOS_SVG["09"] || "" }
+    ];
+    e4El.innerHTML = e4cm.map(item => `
+      <div class="acab-item-row">
+        <span>${item.num}</span>
+        <div class="acab-item-svg">${item.svg}</div>
+      </div>
+    `).join("");
+  }
 
-  // Colunas
-  document.getElementById("colunas-diagram-box").innerHTML = `
-    <div class="column-drawing-item">
-      <span>COLUNA COM 2 PEDRAS</span>
-      <div style="width: 24px; height: 32px;">${ACABAMENTOS_SVG["col-2pedras"]}</div>
-    </div>
-    <div class="column-drawing-item">
-      <span>QUADRADO</span>
-      <div style="width: 24px; height: 32px;">${ACABAMENTOS_SVG["col-quadrado"]}</div>
-    </div>
-    <div class="column-drawing-item">
-      <span>SEXTAVADO</span>
-      <div style="width: 26px; height: 32px;">${ACABAMENTOS_SVG["col-sextavado"]}</div>
-    </div>
-  `;
+  const saiaEl = document.getElementById("acab-saia-list");
+  if (saiaEl) {
+    const saia45 = [
+      { num: "10-45º", svg: ACABAMENTOS_SVG["10"] || "" },
+      { num: "11-OUTROS DESENHOS", svg: ACABAMENTOS_SVG["11"] || "" }
+    ];
+    saiaEl.innerHTML = saia45.map(item => `
+      <div class="acab-item-row">
+        <span>${item.num}</span>
+        <div class="acab-item-svg" style="height: 18px;">${item.svg}</div>
+      </div>
+    `).join("");
+  }
+
+  const colEl = document.getElementById("colunas-diagram-box");
+  if (colEl) {
+    colEl.innerHTML = `
+      <div class="column-drawing-item">
+        <span>COLUNA COM 2 PEDRAS</span>
+        <div style="width: 24px; height: 32px;">${ACABAMENTOS_SVG["col-2pedras"] || ""}</div>
+      </div>
+      <div class="column-drawing-item">
+        <span>QUADRADO</span>
+        <div style="width: 24px; height: 32px;">${ACABAMENTOS_SVG["col-quadrado"] || ""}</div>
+      </div>
+      <div class="column-drawing-item">
+        <span>SEXTAVADO</span>
+        <div style="width: 26px; height: 32px;">${ACABAMENTOS_SVG["col-sextavado"] || ""}</div>
+      </div>
+    `;
+  }
 }
 
 // Preenche os campos do formulário a partir de appData.orcamentoAtual
@@ -259,10 +294,28 @@ function preencherFormulario() {
 function renderizarTabelaItensForm() {
   const container = document.getElementById("itens-form-tbody");
   const orc = appData.orcamentoAtual;
-  if (!container || !orc) return;
+  if (!container || !orc || !orc.itens) return;
+
+  const acabList = (typeof LISTA_ACABAMENTOS !== 'undefined' && Array.isArray(LISTA_ACABAMENTOS)) ? LISTA_ACABAMENTOS : [
+    { id: "01", nome: "01 - Reto (Simples 2cm)" },
+    { id: "02", nome: "02 - Chanfrado (Simples 2cm)" },
+    { id: "03", nome: "03 - Meia Cana (Simples 2cm)" },
+    { id: "04", nome: "04 - Boleado (Simples 2cm)" },
+    { id: "05", nome: "05 - Peito de Pombo (Simples 2cm)" },
+    { id: "06", nome: "06 - Reto (Engrossado 4cm)" },
+    { id: "07", nome: "07 - 1/2 Cana (Engrossado 4cm)" },
+    { id: "08", nome: "08 - Chanfrado Simples (Engrossado 4cm)" },
+    { id: "09", nome: "09 - Boleado Duplo (Engrossado 4cm)" },
+    { id: "10", nome: "10 - 45º (Saia)" },
+    { id: "11", nome: "11 - Outros Desenhos (Saia)" },
+    { id: "col-2pedras", nome: "Coluna 2 Pedras" },
+    { id: "col-quadrado", nome: "Coluna Quadrado" },
+    { id: "col-sextavado", nome: "Coluna Sextavado" },
+    { id: "nenhum", nome: "Sem acabamento" }
+  ];
 
   container.innerHTML = orc.itens.map((item, idx) => {
-    const acabOptions = LISTA_ACABAMENTOS.map(a => 
+    const acabOptions = acabList.map(a => 
       `<option value="${a.id}" ${item.acabamento === a.id ? 'selected' : ''}>${a.nome}</option>`
     ).join("");
 
@@ -299,7 +352,7 @@ function renderizarTabelaItensForm() {
 function renderizarTabelaParcelasForm() {
   const container = document.getElementById("parcelas-form-tbody");
   const orc = appData.orcamentoAtual;
-  if (!container || !orc) return;
+  if (!container || !orc || !orc.parcelas) return;
 
   container.innerHTML = orc.parcelas.map((parc, idx) => `
     <tr>
@@ -319,13 +372,15 @@ function renderizarTabelaParcelasForm() {
 
 // Atualização de dados individuais
 function atualizarItem(idx, campo, valor) {
-  if (!appData.orcamentoAtual || !appData.orcamentoAtual.itens[idx]) return;
+  if (!appData.orcamentoAtual || !appData.orcamentoAtual.itens || !appData.orcamentoAtual.itens[idx]) return;
   appData.orcamentoAtual.itens[idx][campo] = valor;
   atualizarPreview();
+  salvarDadosLocais();
 }
 
 function adicionarNovoItem() {
   if (!appData.orcamentoAtual) return;
+  if (!appData.orcamentoAtual.itens) appData.orcamentoAtual.itens = [];
   appData.orcamentoAtual.itens.push({
     id: Date.now(),
     qtd: 1,
@@ -336,10 +391,11 @@ function adicionarNovoItem() {
   });
   renderizarTabelaItensForm();
   atualizarPreview();
+  salvarDadosLocais();
 }
 
 function removerItem(idx) {
-  if (!appData.orcamentoAtual) return;
+  if (!appData.orcamentoAtual || !appData.orcamentoAtual.itens) return;
   if (appData.orcamentoAtual.itens.length <= 1) {
     alert("O orçamento deve ter pelo menos um item.");
     return;
@@ -347,16 +403,19 @@ function removerItem(idx) {
   appData.orcamentoAtual.itens.splice(idx, 1);
   renderizarTabelaItensForm();
   atualizarPreview();
+  salvarDadosLocais();
 }
 
 function atualizarParcela(idx, campo, valor) {
-  if (!appData.orcamentoAtual || !appData.orcamentoAtual.parcelas[idx]) return;
+  if (!appData.orcamentoAtual || !appData.orcamentoAtual.parcelas || !appData.orcamentoAtual.parcelas[idx]) return;
   appData.orcamentoAtual.parcelas[idx][campo] = valor;
   atualizarPreview();
+  salvarDadosLocais();
 }
 
 function adicionarNovaParcela() {
   if (!appData.orcamentoAtual) return;
+  if (!appData.orcamentoAtual.parcelas) appData.orcamentoAtual.parcelas = [];
   const num = appData.orcamentoAtual.parcelas.length + 1;
   appData.orcamentoAtual.parcelas.push({
     numero: num,
@@ -365,15 +424,17 @@ function adicionarNovaParcela() {
   });
   renderizarTabelaParcelasForm();
   atualizarPreview();
+  salvarDadosLocais();
 }
 
 function removerParcela(idx) {
-  if (!appData.orcamentoAtual) return;
+  if (!appData.orcamentoAtual || !appData.orcamentoAtual.parcelas) return;
   appData.orcamentoAtual.parcelas.splice(idx, 1);
   // Reordena numeração
   appData.orcamentoAtual.parcelas.forEach((p, i) => p.numero = i + 1);
   renderizarTabelaParcelasForm();
   atualizarPreview();
+  salvarDadosLocais();
 }
 
 // Gerador automático de parcelamento (1x, 2x, 3x, 4x, etc.)

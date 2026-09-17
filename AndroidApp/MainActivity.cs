@@ -21,31 +21,43 @@ public class MainActivity : Activity
     {
         base.OnCreate(savedInstanceState);
 
-        _webView = new WebView(this)
+        try
         {
-            LayoutParameters = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MatchParent,
-                ViewGroup.LayoutParams.MatchParent
-            )
-        };
+            _webView = new WebView(this)
+            {
+                LayoutParameters = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MatchParent,
+                    ViewGroup.LayoutParams.MatchParent
+                )
+            };
 
-        var settings = _webView.Settings;
-        settings.JavaScriptEnabled = true;
-        settings.DomStorageEnabled = true;
-        settings.DatabaseEnabled = true;
-        settings.AllowFileAccess = true;
-        settings.AllowFileAccessFromFileURLs = true;
-        settings.AllowUniversalAccessFromFileURLs = true;
-        settings.SetSupportZoom(true);
-        settings.BuiltInZoomControls = true;
-        settings.DisplayZoomControls = false;
+            var settings = _webView.Settings;
+            settings.JavaScriptEnabled = true;
+            settings.DomStorageEnabled = true;
+            settings.DatabaseEnabled = true;
+            settings.AllowFileAccess = true;
+            settings.AllowFileAccessFromFileURLs = true;
+            settings.AllowUniversalAccessFromFileURLs = true;
+            settings.SetSupportZoom(true);
+            settings.BuiltInZoomControls = true;
+            settings.DisplayZoomControls = false;
 
-        _webView.SetWebViewClient(new CustomWebViewClient(this));
-        _webView.SetWebChromeClient(new WebChromeClient());
+            _webView.SetWebViewClient(new CustomWebViewClient(this));
+            _webView.SetWebChromeClient(new CustomWebChromeClient(this));
 
-        SetContentView(_webView);
+            SetContentView(_webView);
 
-        _webView.LoadUrl("file:///android_asset/www/index.html");
+            _webView.LoadUrl("file:///android_asset/www/index.html");
+        }
+        catch (System.Exception ex)
+        {
+            Android.Util.Log.Error("OrcamentosApp", $"Erro no OnCreate: {ex}");
+            new AlertDialog.Builder(this)
+                .SetTitle("Erro de Inicialização")
+                .SetMessage($"Não foi possível carregar o aplicativo:\n{ex.Message}")
+                .SetPositiveButton("Fechar", (s, e) => Finish())
+                .Show();
+        }
     }
 
     public void PrintDocument()
@@ -100,6 +112,10 @@ public class CustomWebViewClient : WebViewClient
         _activity = activity;
     }
 
+    protected CustomWebViewClient(System.IntPtr handle, Android.Runtime.JniHandleOwnership transfer) : base(handle, transfer)
+    {
+    }
+
     public override bool ShouldOverrideUrlLoading(WebView? view, IWebResourceRequest? request)
     {
         if (request?.Url == null) return false;
@@ -132,6 +148,57 @@ public class CustomWebViewClient : WebViewClient
     }
 }
 
+public class CustomWebChromeClient : WebChromeClient
+{
+    private readonly Activity _activity;
+
+    public CustomWebChromeClient(Activity activity)
+    {
+        _activity = activity;
+    }
+
+    protected CustomWebChromeClient(System.IntPtr handle, Android.Runtime.JniHandleOwnership transfer) : base(handle, transfer)
+    {
+    }
+
+    public override bool OnJsAlert(WebView? view, string? url, string? message, JsResult? result)
+    {
+        new AlertDialog.Builder(_activity)
+            .SetTitle("Aviso")
+            .SetMessage(message)
+            .SetPositiveButton("OK", (s, e) => result?.Confirm())
+            .SetCancelable(false)
+            .Show();
+        return true;
+    }
+
+    public override bool OnJsConfirm(WebView? view, string? url, string? message, JsResult? result)
+    {
+        new AlertDialog.Builder(_activity)
+            .SetTitle("Confirmação")
+            .SetMessage(message)
+            .SetPositiveButton("Sim", (s, e) => result?.Confirm())
+            .SetNegativeButton("Não", (s, e) => result?.Cancel())
+            .SetCancelable(false)
+            .Show();
+        return true;
+    }
+
+    public override bool OnJsPrompt(WebView? view, string? url, string? message, string? defaultValue, JsPromptResult? result)
+    {
+        var input = new Android.Widget.EditText(_activity) { Text = defaultValue ?? "" };
+        new AlertDialog.Builder(_activity)
+            .SetTitle("Informação")
+            .SetMessage(message)
+            .SetView(input)
+            .SetPositiveButton("OK", (s, e) => result?.Confirm(input.Text))
+            .SetNegativeButton("Cancelar", (s, e) => result?.Cancel())
+            .SetCancelable(false)
+            .Show();
+        return true;
+    }
+}
+
 public class ValueCallback : Java.Lang.Object, IValueCallback
 {
     private readonly System.Action<Java.Lang.Object?> _callback;
@@ -139,6 +206,10 @@ public class ValueCallback : Java.Lang.Object, IValueCallback
     public ValueCallback(System.Action<Java.Lang.Object?> callback)
     {
         _callback = callback;
+    }
+
+    protected ValueCallback(System.IntPtr handle, Android.Runtime.JniHandleOwnership transfer) : base(handle, transfer)
+    {
     }
 
     public void OnReceiveValue(Java.Lang.Object? value)

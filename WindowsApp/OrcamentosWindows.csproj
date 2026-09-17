@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\index.html;..\app.js;..\style.css;..\logo.png;..\favicon.png;..\icon-192.png;..\icon-512.png" Link="www\%(Filename)%(Extension)">
+    <None Include="..\index.html;..\app.js;..\acabamentos.js;..\style.css;..\logo.png;..\favicon.png;..\icon-192.png;..\icon-512.png;..\manifest.json" Link="www\%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Content Include="..\appicon.ico" Link="appicon.ico">
