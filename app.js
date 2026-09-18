@@ -524,10 +524,23 @@ function atualizarPreview() {
   if (imgLogoEl) {
     imgLogoEl.src = emp.logoUrl || "logo.png";
   }
+
+  const cnpjEl = document.getElementById("p-emp-cnpj");
+  if (cnpjEl) {
+    cnpjEl.innerText = emp.cnpj ? `CNPJ: ${emp.cnpj}` : "";
+  }
+
+  const endEl = document.getElementById("p-emp-endereco");
+  if (endEl) {
+    endEl.innerText = emp.endereco || "";
+  }
   
   // Especialidades
   const espLinhas = (emp.especialidades || "").split('\n').filter(l => l.trim().length > 0);
-  document.getElementById("p-emp-especialidades").innerHTML = espLinhas.map(l => `<div>${escapeHtml(l)}</div>`).join("");
+  const espEl = document.getElementById("p-emp-especialidades");
+  if (espEl) {
+    espEl.innerHTML = espLinhas.map(l => `<div>${escapeHtml(l)}</div>`).join("");
+  }
 
   // Telefones
   const phonesContainer = document.getElementById("p-emp-phones-container");
@@ -536,6 +549,7 @@ function atualizarPreview() {
     if (emp.fone1 && emp.fone1.trim().length > 0) {
       phonesHtml += `
         <div class="phone-contact">
+          <span class="phone-icon">📞</span>
           <span class="phone-number">${escapeHtml(emp.fone1)}</span>
           ${emp.resp1 ? `<span class="person-name">${escapeHtml(emp.resp1)}</span>` : ''}
         </div>
@@ -544,6 +558,7 @@ function atualizarPreview() {
     if (emp.fone2 && emp.fone2.trim().length > 0) {
       phonesHtml += `
         <div class="phone-contact">
+          <span class="phone-icon">📞</span>
           <span class="phone-number">${escapeHtml(emp.fone2)}</span>
           ${emp.resp2 ? `<span class="person-name">${escapeHtml(emp.resp2)}</span>` : ''}
         </div>
@@ -553,11 +568,22 @@ function atualizarPreview() {
   }
 
   // Data e Número
-  document.getElementById("p-data-extenso").innerText = formatarDataExtensa(orc.data, orc.cidade);
-  document.getElementById("p-numero").innerText = orc.numero || "---";
+  const dateEl = document.getElementById("p-data-extenso");
+  if (dateEl) {
+    dateEl.innerText = formatarDataExtensa(orc.data, orc.cidade);
+  }
+  const numEl = document.getElementById("p-numero");
+  if (numEl) {
+    numEl.innerText = orc.numero || "---";
+  }
 
   // Cliente
-  document.getElementById("p-cli-nome").innerText = orc.cliente.nome || "";
+  const setTxt = (id, val, def = "---") => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = (val && String(val).trim().length > 0) ? val : def;
+  };
+
+  setTxt("p-cli-nome", orc.cliente.nome, "---");
   
   let enderecoCompleto = orc.cliente.endereco || "";
   if (orc.cliente.numero && orc.cliente.numero.trim()) {
@@ -566,85 +592,106 @@ function atualizarPreview() {
   if (orc.cliente.complemento && orc.cliente.complemento.trim()) {
     enderecoCompleto += (enderecoCompleto ? " - " : "") + orc.cliente.complemento.trim();
   }
-  document.getElementById("p-cli-endereco").innerText = enderecoCompleto;
+  setTxt("p-cli-endereco", enderecoCompleto, "---");
 
-  document.getElementById("p-cli-bairro").innerText = orc.cliente.bairro || "";
-  document.getElementById("p-cli-cep").innerText = orc.cliente.cep || "";
-  document.getElementById("p-cli-cidade").innerText = orc.cliente.cidade || "";
-  document.getElementById("p-cli-estado").innerText = orc.cliente.estado || "";
-  document.getElementById("p-cli-foneres").innerText = orc.cliente.foneRes || "";
-  document.getElementById("p-cli-fonecel").innerText = orc.cliente.foneCel || "";
-  document.getElementById("p-cli-fonecom").innerText = orc.cliente.foneCom || "";
-  document.getElementById("p-cli-email").innerText = orc.cliente.email || "";
-  document.getElementById("p-cli-cpfcnpj").innerText = orc.cliente.cpfCnpj || "";
-  document.getElementById("p-cli-rg").innerText = orc.cliente.rg || "";
-  document.getElementById("p-cli-condpag").innerText = orc.cliente.condicoesPagamento || "";
+  setTxt("p-cli-bairro", orc.cliente.bairro, "---");
+  setTxt("p-cli-cep", orc.cliente.cep, "---");
+  setTxt("p-cli-cidade", orc.cliente.cidade, "São Paulo");
+  setTxt("p-cli-estado", orc.cliente.estado, "SP");
+  
+  // Agrupa telefones preenchidos
+  let fonesList = [];
+  if (orc.cliente.foneCel && orc.cliente.foneCel.trim()) fonesList.push(orc.cliente.foneCel.trim());
+  if (orc.cliente.foneRes && orc.cliente.foneRes.trim()) fonesList.push(orc.cliente.foneRes.trim() + " (Res)");
+  if (orc.cliente.foneCom && orc.cliente.foneCom.trim()) fonesList.push(orc.cliente.foneCom.trim() + " (Com)");
+  setTxt("p-cli-fonecel", fonesList.join(" / "), "---");
+
+  setTxt("p-cli-email", orc.cliente.email, "---");
+  setTxt("p-cli-cpfcnpj", orc.cliente.cpfCnpj, "---");
+  setTxt("p-cli-rg", orc.cliente.rg, "---");
+  setTxt("p-cli-condpag", orc.cliente.condicoesPagamento, "A combinar");
 
   // Itens da Tabela
   const tbodyItens = document.getElementById("p-itens-tbody");
-  let linhasHtml = "";
+  if (tbodyItens) {
+    let linhasHtml = "";
 
-  orc.itens.forEach(item => {
-    let valorFormatado = "-";
-    if (item.valor && item.valor.trim().length > 0) {
-      if (item.valor.includes("R$")) {
-        valorFormatado = item.valor;
-      } else {
-        valorFormatado = `R$ ${item.valor}`;
+    const acabNomes = {
+      "01": "01 - Reto",
+      "02": "02 - Chanfrado",
+      "03": "03 - Meia Cana",
+      "04": "04 - Boleado",
+      "05": "05 - P. Pombo",
+      "06": "06 - Reto 4cm",
+      "07": "07 - 1/2 Cana",
+      "08": "08 - Chanf. 4cm",
+      "09": "09 - Boleado Dup.",
+      "10": "10 - 45º Saia",
+      "11": "11 - Especiais",
+      "col-2pedras": "Col. 2 Pedras",
+      "col-quadrado": "Col. Quadrado",
+      "col-sextavado": "Col. Sextavado",
+      "nenhum": "Sem acab."
+    };
+
+    orc.itens.forEach(item => {
+      let valorFormatado = "-";
+      if (item.valor && item.valor.trim().length > 0) {
+        if (item.valor.includes("R$")) {
+          valorFormatado = item.valor;
+        } else {
+          valorFormatado = `R$ ${item.valor}`;
+        }
       }
+
+      let acabExibido = acabNomes[item.acabamento] || item.acabamento || "-";
+
+      linhasHtml += `
+        <tr>
+          <td class="col-qtd">${item.qtd || 1}</td>
+          <td class="col-desc">${escapeHtml(item.descricao || "")}</td>
+          <td class="col-acab">${acabExibido}</td>
+          <td class="col-cor">${escapeHtml(item.cor || "")}</td>
+          <td class="col-val">${valorFormatado}</td>
+        </tr>
+      `;
+    });
+
+    // Linhas vazias para manter o grid elegante sem estourar a folha
+    const linhasVaziasNecessarias = Math.max(1, 5 - orc.itens.length);
+    for (let i = 0; i < linhasVaziasNecessarias; i++) {
+      linhasHtml += `
+        <tr>
+          <td class="col-qtd" style="height: 18px;">&nbsp;</td>
+          <td class="col-desc"></td>
+          <td class="col-acab"></td>
+          <td class="col-cor"></td>
+          <td class="col-val"></td>
+        </tr>
+      `;
     }
-
-    // Extrai o número do acabamento (ex: '01' vira '1', '10' vira '10')
-    let acabExibido = item.acabamento || "";
-    if (acabExibido.startsWith("0")) {
-      acabExibido = acabExibido.substring(1);
-    } else if (acabExibido.startsWith("col-")) {
-      acabExibido = acabExibido.replace("col-", "");
-    }
-
-    linhasHtml += `
-      <tr>
-        <td class="col-qtd">${item.qtd || ""}</td>
-        <td class="col-desc">${escapeHtml(item.descricao || "")}</td>
-        <td class="col-acab">${acabExibido}</td>
-        <td class="col-cor">${escapeHtml(item.cor || "")}</td>
-        <td class="col-val">${valorFormatado}</td>
-      </tr>
-    `;
-  });
-
-  // Linhas vazias para preencher o grid de forma equilibrada sem estourar a folha A4
-  const linhasVaziasNecessarias = Math.max(1, 6 - orc.itens.length);
-  for (let i = 0; i < linhasVaziasNecessarias; i++) {
-    linhasHtml += `
-      <tr>
-        <td class="col-qtd" style="height: 18px;">&nbsp;</td>
-        <td class="col-desc"></td>
-        <td class="col-acab"></td>
-        <td class="col-cor"></td>
-        <td class="col-val"></td>
-      </tr>
-    `;
+    tbodyItens.innerHTML = linhasHtml;
   }
-  tbodyItens.innerHTML = linhasHtml;
 
   // Parcelas
   const tbodyParcelas = document.getElementById("p-parcelas-tbody");
-  let parcHtml = "";
-  const maxParc = Math.max(2, (orc.parcelas ? orc.parcelas.length : 0));
-  for (let i = 0; i < maxParc; i++) {
-    const p = (orc.parcelas && orc.parcelas[i]) ? orc.parcelas[i] : { numero: i + 1, valor: "", vencimento: "" };
-    let val = p.valor ? (p.valor.includes("R$") ? p.valor : `R$ ${p.valor}`) : "";
-    let dataFormatada = p.vencimento ? formatarDataSimples(p.vencimento) : "";
-    parcHtml += `
-      <tr>
-        <td style="width: 40px;">${p.numero}</td>
-        <td style="width: 65px;">${val}</td>
-        <td>${dataFormatada}</td>
-      </tr>
-    `;
+  if (tbodyParcelas) {
+    let parcHtml = "";
+    const maxParc = Math.max(2, (orc.parcelas ? orc.parcelas.length : 0));
+    for (let i = 0; i < maxParc; i++) {
+      const p = (orc.parcelas && orc.parcelas[i]) ? orc.parcelas[i] : { numero: i + 1, valor: "", vencimento: "" };
+      let val = p.valor ? (p.valor.includes("R$") ? p.valor : `R$ ${p.valor}`) : "-";
+      let dataFormatada = p.vencimento ? formatarDataSimples(p.vencimento) : "-";
+      parcHtml += `
+        <tr>
+          <td style="width: 50px;">${p.numero}ª</td>
+          <td>${val}</td>
+          <td>${dataFormatada}</td>
+        </tr>
+      `;
+    }
+    tbodyParcelas.innerHTML = parcHtml;
   }
-  tbodyParcelas.innerHTML = parcHtml;
 
   // Total
   const totalNum = calcularTotalNumerico();
@@ -654,18 +701,26 @@ function atualizarPreview() {
   } else if (orc.itens.length > 0 && orc.itens.some(i => i.valor && i.valor.trim() !== "")) {
     totalExibido = orc.itens.find(i => i.valor && i.valor.trim() !== "").valor;
   }
-  document.getElementById("p-total-valor").innerText = totalExibido;
+  const totalEl = document.getElementById("p-total-valor");
+  if (totalEl) {
+    totalEl.innerText = totalExibido;
+  }
 
   // Observação
   const obsContainer = document.getElementById("p-obs-container");
-  if (orc.observacoes && orc.observacoes.trim().length > 0) {
-    obsContainer.innerHTML = `<div class="obs-box">${escapeHtml(orc.observacoes).replace(/\n/g, '<br>')}</div>`;
-  } else {
-    obsContainer.innerHTML = "";
+  if (obsContainer) {
+    if (orc.observacoes && orc.observacoes.trim().length > 0) {
+      obsContainer.innerHTML = `<div class="obs-box">${escapeHtml(orc.observacoes).replace(/\n/g, '<br>')}</div>`;
+    } else {
+      obsContainer.innerHTML = "";
+    }
   }
 
   // Dados Bancários
-  document.getElementById("p-dadosbancarios").innerText = orc.dadosBancarios || "";
+  const dadosBancariosEl = document.getElementById("p-dadosbancarios");
+  if (dadosBancariosEl) {
+    dadosBancariosEl.innerText = orc.dadosBancarios || "";
+  }
 }
 
 // Configuração dos ouvintes de eventos da interface

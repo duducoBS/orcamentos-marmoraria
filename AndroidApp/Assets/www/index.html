@@ -247,7 +247,7 @@
       </div>
 
       <!-- =========================================================
-           DOCUMENTO A4 IMPRESSO (LAYOUT IDÊNTICO AO EXEMPLO FORNECIDO)
+           DOCUMENTO A4 IMPRESSO (LAYOUT PROFISSIONAL REFORMULADO)
            ========================================================= -->
       <div class="a4-sheet" id="a4-sheet-document" style="transform: scale(0.8); margin-bottom: -60px;">
         
@@ -255,16 +255,19 @@
         <header class="orc-header">
           <div class="header-left">
             <img src="logo.png" alt="Edu Mármores & Granitos" class="header-logo-img" id="p-emp-logo-img">
+            <div class="header-company-info">
+              <div class="header-company-cnpj" id="p-emp-cnpj">CNPJ: 26.106.792/0001-77</div>
+              <div class="header-company-address" id="p-emp-endereco">Av. Barreira Grande, 3001 - Jd. Imperador - São Paulo - SP</div>
+            </div>
           </div>
           <div class="header-right">
             <div class="specialties-list" id="p-emp-especialidades">
-              <div>MÁRMORES - GRANITOS</div>
-              <div>PEDRAS DECORATIVAS</div>
-              <div>PIAS - LAVATÓRIOS - PISOS</div>
-              <div>ESCADAS - SOLEIRAS - ETC.</div>
+              <div>MÁRMORES • GRANITOS • PEDRAS DECORATIVAS</div>
+              <div>PIAS • LAVATÓRIOS • PISOS • ESCADAS • SOLEIRAS</div>
             </div>
-            <div class="header-phones" id="p-emp-phones-container">
+            <div class="header-phones-card" id="p-emp-phones-container">
               <div class="phone-contact">
+                <span class="phone-icon">📞</span>
                 <span class="phone-number" id="p-emp-fone1">94031-1110</span>
                 <span class="person-name" id="p-emp-resp1">Edu</span>
               </div>
@@ -273,60 +276,90 @@
         </header>
 
         <!-- 2. DATA E NÚMERO DO ORÇAMENTO -->
-        <div class="orc-meta-bar">
-          <div class="orc-meta-date" id="p-data-extenso">
-            São Paulo, 21 de janeiro de 2021
+        <div class="orc-meta-banner">
+          <div class="meta-date-box">
+            <span class="meta-icon">📅</span>
+            <span class="meta-date-text" id="p-data-extenso">São Paulo, 18 de setembro de 2026</span>
           </div>
-          <div class="orc-meta-title">
-            ORÇAMENTO Nº:
-          </div>
-          <div class="orc-meta-number" id="p-numero">
-            116
+          <div class="meta-doc-badge">
+            <span class="meta-doc-label">PROPOSTA / ORÇAMENTO</span>
+            <span class="meta-doc-number-wrap">Nº <span id="p-numero">117</span></span>
           </div>
         </div>
 
-        <!-- 3. DADOS DO CLIENTE -->
-        <table class="client-info-table">
-          <tbody>
-            <tr>
-              <td colspan="4"><span class="lbl">Nome: </span><span class="val" id="p-cli-nome"></span></td>
-            </tr>
-            <tr>
-              <td colspan="4"><span class="lbl">Endereço: </span><span class="val" id="p-cli-endereco"></span></td>
-            </tr>
-            <tr>
-              <td style="width: 28%;"><span class="lbl">Bairro: </span><span class="val" id="p-cli-bairro"></span></td>
-              <td style="width: 24%;"><span class="lbl">CEP: </span><span class="val" id="p-cli-cep"></span></td>
-              <td style="width: 33%;"><span class="lbl">Cidade: </span><span class="val" id="p-cli-cidade"></span></td>
-              <td style="width: 15%;"><span class="lbl">Estado: </span><span class="val" id="p-cli-estado"></span></td>
-            </tr>
-            <tr>
-              <td style="width: 28%;"><span class="lbl">Fone Res.: </span><span class="val" id="p-cli-foneres"></span></td>
-              <td colspan="2"><span class="lbl">Fone Cel.: </span><span class="val" id="p-cli-fonecel"></span></td>
-              <td><span class="lbl">Fone Com.: </span><span class="val" id="p-cli-fonecom"></span></td>
-            </tr>
-            <tr>
-              <td colspan="4"><span class="lbl">Email: </span><span class="val" id="p-cli-email"></span></td>
-            </tr>
-            <tr>
-              <td colspan="2"><span class="lbl">CPF/CNPJ: </span><span class="val" id="p-cli-cpfcnpj"></span></td>
-              <td colspan="2"><span class="lbl">RG: </span><span class="val" id="p-cli-rg"></span></td>
-            </tr>
-            <tr>
-              <td colspan="4"><span class="lbl">Condições de pagam.: </span><span class="val" id="p-cli-condpag"></span></td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- 3. DADOS DO CLIENTE (CARD ESTRUTURADO E BEM DISTRIBUÍDO) -->
+        <div class="orc-client-card">
+          <div class="client-card-header">
+            <span>DADOS DO CLIENTE / SOLICITANTE</span>
+          </div>
+          <div class="client-grid">
+            <!-- Linha 1: Nome -->
+            <div class="client-field-row row-full">
+              <span class="c-lbl">NOME / RAZÃO SOCIAL:</span>
+              <span class="c-val client-name-highlight" id="p-cli-nome">---</span>
+            </div>
+
+            <!-- Linha 2: Endereço e Bairro -->
+            <div class="client-field-row row-address">
+              <div class="c-col flex-3">
+                <span class="c-lbl">ENDEREÇO:</span>
+                <span class="c-val" id="p-cli-endereco">---</span>
+              </div>
+              <div class="c-col flex-2">
+                <span class="c-lbl">BAIRRO:</span>
+                <span class="c-val" id="p-cli-bairro">---</span>
+              </div>
+            </div>
+
+            <!-- Linha 3: Cidade/UF, CEP, CPF/CNPJ, RG -->
+            <div class="client-field-row row-details">
+              <div class="c-col flex-2">
+                <span class="c-lbl">CIDADE / UF:</span>
+                <span class="c-val"><span id="p-cli-cidade">São Paulo</span> - <span id="p-cli-estado">SP</span></span>
+              </div>
+              <div class="c-col flex-1">
+                <span class="c-lbl">CEP:</span>
+                <span class="c-val" id="p-cli-cep">---</span>
+              </div>
+              <div class="c-col flex-2">
+                <span class="c-lbl">CPF / CNPJ:</span>
+                <span class="c-val" id="p-cli-cpfcnpj">---</span>
+              </div>
+              <div class="c-col flex-1">
+                <span class="c-lbl">RG:</span>
+                <span class="c-val" id="p-cli-rg">---</span>
+              </div>
+            </div>
+
+            <!-- Linha 4: Contatos e Condições de Pagamento -->
+            <div class="client-field-row row-contact-payment">
+              <div class="c-col flex-2">
+                <span class="c-lbl">TELEFONE / WHATSAPP:</span>
+                <span class="c-val contact-highlight" id="p-cli-fonecel">---</span>
+                <span id="p-cli-foneres" style="display:none;"></span>
+                <span id="p-cli-fonecom" style="display:none;"></span>
+              </div>
+              <div class="c-col flex-2">
+                <span class="c-lbl">E-MAIL:</span>
+                <span class="c-val" id="p-cli-email">---</span>
+              </div>
+              <div class="c-col flex-2">
+                <span class="c-lbl">CONDIÇÃO DE PAGAMENTO:</span>
+                <span class="c-val payment-highlight" id="p-cli-condpag">---</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- 4. TABELA DE ITENS / MERCADORIAS -->
         <div class="products-table-container">
           <table class="products-table">
             <thead>
               <tr>
-                <th class="col-qtd">Quantidade</th>
-                <th class="col-desc">Descrição da Mercadoria</th>
-                <th class="col-acab">Acabamento<br>Nº</th>
-                <th class="col-cor">Cor</th>
+                <th class="col-qtd">Qtd</th>
+                <th class="col-desc">Descrição da Mercadoria / Ambiente / Peça</th>
+                <th class="col-acab">Acabamento</th>
+                <th class="col-cor">Cor / Material</th>
                 <th class="col-val">Valor</th>
               </tr>
             </thead>
@@ -338,63 +371,24 @@
 
         <!-- 5. SEÇÃO DE ILUSTRAÇÕES DE ACABAMENTOS (BORDAS E COLUNAS) -->
         <div class="acabamentos-section">
-          <div class="acabamentos-grid">
-            
-            <!-- Grupo 1: Simples 2.0 cm -->
-            <div class="acab-group">
-              <div class="acab-header">
-                Simples com 2,0 cm de borda<br>
-                <span class="sub">para soleiras, pingadeiras balcões, lavatórios, etc</span>
-              </div>
-              <div class="acab-items-list" id="acab-simples-list">
-                <!-- Gerado por acabamentos.js -->
-              </div>
-            </div>
-
-            <!-- Grupo 2: Engrossado 4.0 cm -->
-            <div class="acab-group">
-              <div class="acab-header">
-                Acabamento engrossado com 4,0 cm de borda<br>
-                <span class="sub">usado para pias, balcões, lavatórios, etc.</span>
-              </div>
-              <div class="acab-items-list" id="acab-engrossado-list">
-                <!-- Gerado por acabamentos.js -->
-              </div>
-            </div>
-
-            <!-- Grupo 3: 45º com saia -->
-            <div class="acab-group">
-              <div class="acab-header">
-                Acabamento 45º com saia<br>
-                <span class="sub">a partir de 6,0 cm de borda.</span>
-              </div>
-              <div class="acab-items-list" id="acab-saia-list">
-                <!-- Gerado por acabamentos.js -->
-              </div>
-            </div>
-
-            <!-- Grupo 4: Colunas -->
-            <div class="acab-group">
-              <div class="acab-header">
-                Colunas
-              </div>
-              <div class="columns-diagram-container" id="colunas-diagram-box">
-                <!-- Gerado por acabamentos.js -->
-              </div>
-            </div>
-
+          <div class="acabamentos-title-bar">
+            <span>GUIA TÉCNICO DE ACABAMENTOS DE BORDAS E COLUNAS</span>
+          </div>
+          <div class="acabamentos-img-wrapper">
+            <img src="acabamentos.png" alt="Guia Técnico de Acabamentos de Bordas e Colunas" class="acabamentos-img">
           </div>
         </div>
 
         <!-- 6. SEÇÃO FINANCEIRA: PARCELAS, TOTAL E OBSERVAÇÕES -->
         <div class="financial-section">
-          <div class="parcelas-box">
+          <div class="parcelas-card">
+            <div class="finance-card-title">PARCELAMENTO / VENCIMENTOS</div>
             <table class="parcelas-table">
               <thead>
                 <tr>
-                  <th style="width: 45px;">parcela</th>
-                  <th style="width: 65px;">valor</th>
-                  <th>vencimento</th>
+                  <th style="width: 50px;">Parcela</th>
+                  <th>Valor</th>
+                  <th>Vencimento</th>
                 </tr>
               </thead>
               <tbody id="p-parcelas-tbody">
@@ -403,10 +397,12 @@
             </table>
           </div>
           <div class="total-and-obs">
-            <div class="total-row">
-              <span class="total-title">Valor total :</span>
-              <span class="total-currency">R$</span>
-              <span class="total-value-display" id="p-total-valor">860,00</span>
+            <div class="total-highlight-card">
+              <span class="total-title">VALOR TOTAL DO ORÇAMENTO:</span>
+              <div class="total-value-wrap">
+                <span class="total-currency">R$</span>
+                <span class="total-value-display" id="p-total-valor">0,00</span>
+              </div>
             </div>
             <div class="obs-row" id="p-obs-container">
               <div class="obs-box">
@@ -419,13 +415,24 @@
         <!-- 7. BLOCO DE FECHAMENTO (ASSINATURAS E DADOS BANCÁRIOS) -->
         <div class="orc-footer-block">
           <div class="signatures-section">
-            <div class="sign-line">VENDEDOR</div>
-            <div class="sign-line">COMPRADOR</div>
+            <div class="sign-block">
+              <div class="sign-line"></div>
+              <span class="sign-role">EDU MÁRMORES & GRANITOS</span>
+              <span class="sign-sub">Responsável Técnico / Vendedor</span>
+            </div>
+            <div class="sign-block">
+              <div class="sign-line"></div>
+              <span class="sign-role">DE ACORDO DO CLIENTE</span>
+              <span class="sign-sub">Assinatura do Solicitante / Data: ____/____/________</span>
+            </div>
           </div>
 
           <!-- 8. DADOS BANCÁRIOS / PIX NO RODAPÉ -->
-          <footer class="bank-details-footer" id="p-dadosbancarios">
-            Dados Bancarios: Caixa Econômica Agencia:242/ operação 013/ conta poupança 7675-7/ CPF:148.374.878-23 Cicero Eduardo dos Santos
+          <footer class="bank-details-footer" id="p-dadosbancarios-container">
+            <div class="bank-badge">DADOS BANCÁRIOS & PIX</div>
+            <div class="bank-text" id="p-dadosbancarios">
+              Dados Bancarios: Caixa Econômica Agencia:242/ operação 013/ conta poupança 7675-7/ CPF:148.374.878-23 Cicero Eduardo dos Santos
+            </div>
           </footer>
         </div>
 
