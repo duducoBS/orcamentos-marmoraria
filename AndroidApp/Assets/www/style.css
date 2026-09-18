@@ -675,82 +675,19 @@ textarea.form-control {
   text-transform: uppercase;
 }
 
-.acabamentos-grid {
-  display: grid;
-  grid-template-columns: 1.15fr 1.3fr 1.35fr 1.2fr;
-  gap: 6px;
-  padding: 4px 6px;
-}
-
-.acab-group {
-  border-right: 1px solid #e2e8f0;
-  padding-right: 6px;
-}
-
-.acab-group:last-child {
-  border-right: none;
-  padding-right: 0;
-}
-
-.acab-header {
-  font-size: 7.5px;
-  text-align: center;
-  margin-bottom: 3px;
-  line-height: 1.15;
-  min-height: 22px;
+.acabamentos-img-wrapper {
+  padding: 3px 6px;
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  color: #0f172a;
-}
-
-.acab-header strong {
-  font-weight: 800;
-}
-
-.acab-header span.sub {
-  font-size: 6.8px;
-  font-weight: 500;
-  color: #64748b;
-}
-
-.acab-items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2.5px;
-}
-
-.acab-item-row {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-size: 7.2px;
-  font-weight: 700;
-  color: #1e293b;
+  background: #ffffff;
 }
 
-.acab-item-row span {
-  white-space: nowrap;
-}
-
-.acab-item-svg {
-  width: 44px;
-  height: 12px;
-}
-
-.columns-diagram-container {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.column-drawing-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 7.2px;
-  font-weight: 700;
-  color: #1e293b;
+.acabamentos-img {
+  width: 100%;
+  max-height: 130px;
+  object-fit: contain;
+  display: block;
 }
 
 /* 6. SEÇÃO FINANCEIRA (PARCELAS + TOTAL + OBS) */
