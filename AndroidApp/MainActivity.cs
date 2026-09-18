@@ -9,6 +9,7 @@ namespace OrcamentosMarmoraria;
 
 [Activity(
     Label = "Orçamentos Marmoraria",
+    Icon = "@mipmap/appicon",
     MainLauncher = true,
     Theme = "@android:style/Theme.NoTitleBar.Fullscreen",
     ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize
@@ -43,7 +44,7 @@ public class MainActivity : Activity
             settings.DisplayZoomControls = false;
 
             _webView.SetWebViewClient(new CustomWebViewClient(this));
-            _webView.SetWebChromeClient(new CustomWebChromeClient(this));
+            _webView.SetWebChromeClient(new WebChromeClient());
 
             SetContentView(_webView);
 
@@ -52,11 +53,13 @@ public class MainActivity : Activity
         catch (System.Exception ex)
         {
             Android.Util.Log.Error("OrcamentosApp", $"Erro no OnCreate: {ex}");
-            new AlertDialog.Builder(this)
-                .SetTitle("Erro de Inicialização")
-                .SetMessage($"Não foi possível carregar o aplicativo:\n{ex.Message}")
-                .SetPositiveButton("Fechar", (s, e) => Finish())
-                .Show();
+            var errorView = new Android.Widget.TextView(this)
+            {
+                Text = $"Erro de Inicialização:\n{ex.Message}\n\n{ex.StackTrace}",
+                TextSize = 16,
+                Gravity = Android.Views.GravityFlags.Center
+            };
+            SetContentView(errorView);
         }
     }
 
@@ -148,56 +151,6 @@ public class CustomWebViewClient : WebViewClient
     }
 }
 
-public class CustomWebChromeClient : WebChromeClient
-{
-    private readonly Activity _activity;
-
-    public CustomWebChromeClient(Activity activity)
-    {
-        _activity = activity;
-    }
-
-    protected CustomWebChromeClient(System.IntPtr handle, Android.Runtime.JniHandleOwnership transfer) : base(handle, transfer)
-    {
-    }
-
-    public override bool OnJsAlert(WebView? view, string? url, string? message, JsResult? result)
-    {
-        new AlertDialog.Builder(_activity)
-            .SetTitle("Aviso")
-            .SetMessage(message)
-            .SetPositiveButton("OK", (s, e) => result?.Confirm())
-            .SetCancelable(false)
-            .Show();
-        return true;
-    }
-
-    public override bool OnJsConfirm(WebView? view, string? url, string? message, JsResult? result)
-    {
-        new AlertDialog.Builder(_activity)
-            .SetTitle("Confirmação")
-            .SetMessage(message)
-            .SetPositiveButton("Sim", (s, e) => result?.Confirm())
-            .SetNegativeButton("Não", (s, e) => result?.Cancel())
-            .SetCancelable(false)
-            .Show();
-        return true;
-    }
-
-    public override bool OnJsPrompt(WebView? view, string? url, string? message, string? defaultValue, JsPromptResult? result)
-    {
-        var input = new Android.Widget.EditText(_activity) { Text = defaultValue ?? "" };
-        new AlertDialog.Builder(_activity)
-            .SetTitle("Informação")
-            .SetMessage(message)
-            .SetView(input)
-            .SetPositiveButton("OK", (s, e) => result?.Confirm(input.Text))
-            .SetNegativeButton("Cancelar", (s, e) => result?.Cancel())
-            .SetCancelable(false)
-            .Show();
-        return true;
-    }
-}
 
 public class ValueCallback : Java.Lang.Object, IValueCallback
 {
