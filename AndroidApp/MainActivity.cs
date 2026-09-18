@@ -108,7 +108,7 @@ public class MainActivity : Activity
 
 public class CustomWebViewClient : WebViewClient
 {
-    private readonly MainActivity _activity;
+    private readonly MainActivity? _activity;
 
     public CustomWebViewClient(MainActivity activity)
     {
@@ -119,16 +119,29 @@ public class CustomWebViewClient : WebViewClient
     {
     }
 
+    public override bool ShouldOverrideUrlLoading(WebView? view, string? url)
+    {
+        if (string.IsNullOrEmpty(url) || _activity == null) return false;
+        return HandleUrl(url);
+    }
+
     public override bool ShouldOverrideUrlLoading(WebView? view, IWebResourceRequest? request)
     {
-        if (request?.Url == null) return false;
+        if (request?.Url == null || _activity == null) return false;
         var url = request.Url.ToString();
         if (string.IsNullOrEmpty(url)) return false;
+        return HandleUrl(url);
+    }
+
+    private bool HandleUrl(string url)
+    {
+        Android.Util.Log.Info("OrcamentosApp", $"ShouldOverrideUrlLoading: {url}");
 
         // Intercepta comando de impressão nativa do Android
         if (url.StartsWith("app://print") || url.StartsWith("action://print"))
         {
-            _activity.PrintDocument();
+            Android.Util.Log.Info("OrcamentosApp", "Executando PrintDocument()");
+            _activity?.PrintDocument();
             return true;
         }
 
@@ -138,11 +151,12 @@ public class CustomWebViewClient : WebViewClient
             try
             {
                 var intent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(url));
-                _activity.StartActivity(intent);
+                _activity?.StartActivity(intent);
                 return true;
             }
-            catch
+            catch (System.Exception ex)
             {
+                Android.Util.Log.Warn("OrcamentosApp", $"Erro ao abrir intent externo: {ex.Message}");
                 return true;
             }
         }
@@ -154,7 +168,7 @@ public class CustomWebViewClient : WebViewClient
 
 public class ValueCallback : Java.Lang.Object, IValueCallback
 {
-    private readonly System.Action<Java.Lang.Object?> _callback;
+    private readonly System.Action<Java.Lang.Object?>? _callback;
 
     public ValueCallback(System.Action<Java.Lang.Object?> callback)
     {
@@ -167,6 +181,6 @@ public class ValueCallback : Java.Lang.Object, IValueCallback
 
     public void OnReceiveValue(Java.Lang.Object? value)
     {
-        _callback(value);
+        _callback?.Invoke(value);
     }
 }
