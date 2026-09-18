@@ -995,17 +995,16 @@ function executarImpressaoAndroid() {
     } catch (e) {
       console.warn("Falha ao acionar protocolo do app:", e);
     }
-
-    // Fallback: se estiver em navegador mobile comum (fora do APK)
-    setTimeout(() => {
-      window.print();
-    }, 500);
   }, 250);
 }
 
 // Compatibilidade
 function executarImpressao() {
-  executarImpressaoPC();
+  if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 900) {
+    executarImpressaoAndroid();
+  } else {
+    executarImpressaoPC();
+  }
 }
 
 // Utilitário para escapar caracteres HTML

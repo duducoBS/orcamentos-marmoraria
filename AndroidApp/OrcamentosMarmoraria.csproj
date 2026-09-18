@@ -6,12 +6,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationId>com.edumarmoraria.orcamentos</ApplicationId>
-    <ApplicationVersion>3</ApplicationVersion>
-    <ApplicationDisplayVersion>1.2</ApplicationDisplayVersion>
+    <ApplicationVersion>4</ApplicationVersion>
+    <ApplicationDisplayVersion>1.3</ApplicationDisplayVersion>
     <AndroidSdkDirectory>C:\Users\eduar\AndroidSdk</AndroidSdkDirectory>
     <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <RuntimeIdentifiers>android-arm;android-arm64;android-x86;android-x64</RuntimeIdentifiers>
+    <TargetSdkVersion>34</TargetSdkVersion>
     <PublishTrimmed>false</PublishTrimmed>
     <RunAOTCompilation>false</RunAOTCompilation>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    <AndroidEnableMarshalMethods>false</AndroidEnableMarshalMethods>
   </PropertyGroup>
 
   <ItemGroup>
